@@ -76,22 +76,11 @@ def plot_shot_gather_byRange(obsnum,obsfile,shot_beg,shot_end,tlims,throw,ktpfil
     #shot_rang_match=[shots,rng[shotind]]
     
     #Assign reduction velocity  
-    vred = 3000  #m/s
+    vred = 5000  #m/s
     
     #Convert ktp file to lists/arrays with the various pick segments for each branch
     [pg, pn, pb]=read_ktp.read_ktp(ktpfile,throw,shot_end)
     pg,pn,pb=np.array(pg),np.array(pn),np.array(pb)
-    
-    [pg, pn, pb]=read_ktp.read_ktp(ktpfile,throw,shot_end)
-    for k1 in range(pg.shape[0]):
-        for k2 in range(pg.shape[1]):
-            pg[k1,k2]=np.array(pg[k1,k2])
-    for k1 in range(pn.shape[0]):
-        for k2 in range(pn.shape[1]):
-            pn[k1,k2]=np.array(pn[k1,k2])
-    for k1 in range(pb.shape[0]):
-        for k2 in range(pb.shape[1]):
-            pb[k1,k2]=np.array(pb[k1,k2])
                     
     #Find ranges for each in order to get time with reduction velocity
     pgin,pnin,pbin=[],[],[]
@@ -206,7 +195,7 @@ def plot_shot_gather_byRange(obsnum,obsfile,shot_beg,shot_end,tlims,throw,ktpfil
                 #subtract the first shot number from each called shot here so the index 
                 #used for shotx starts at 0 if the first shot called is shot_beg, and after
                 #that will be "offset" by shot_beg 
-                plt.plot(shotx[pg_shotind-shot_beg],ttmp,color='k',alpha=0.7,linewidth=2)
+                #plt.plot(shotx[pg_shotind-shot_beg],ttmp,color='k',alpha=0.7,linewidth=2)
         ##pn: - this has been finagled, need to fix read_ktp to get rid of empty array
         ttmp=None
         for i in range(pn.shape[1]):
@@ -215,7 +204,7 @@ def plot_shot_gather_byRange(obsnum,obsfile,shot_beg,shot_end,tlims,throw,ktpfil
                 for j in range(len(pnr[i])):
                     ind=np.where(sn[i][j]==fshots)
                     if ind:
-                        plt.plot(shotx[ind],ttmp,color='m',alpha=0.7,linewidth=2)
+                        plt.plot(shotx[ind],ttmp[j],color='m',alpha=0.7,linewidth=2)
         ##pb:
         ttmp=None
         for i in range(pb.shape[1]):
