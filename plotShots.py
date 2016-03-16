@@ -82,6 +82,16 @@ def plot_shot_gather_byRange(obsnum,obsfile,shot_beg,shot_end,tlims,throw,ktpfil
     [pg, pn, pb]=read_ktp.read_ktp(ktpfile,throw,shot_end)
     pg,pn,pb=np.array(pg),np.array(pn),np.array(pb)
     
+    [pg, pn, pb]=read_ktp.read_ktp(ktpfile,throw,shot_end)
+    for k1 in range(pg.shape[0]):
+        for k2 in range(pg.shape[1]):
+            pg[k1,k2]=np.array(pg[k1,k2])
+    for k1 in range(pn.shape[0]):
+        for k2 in range(pn.shape[1]):
+            pn[k1,k2]=np.array(pn[k1,k2])
+    for k1 in range(pb.shape[0]):
+        for k2 in range(pb.shape[1]):
+            pb[k1,k2]=np.array(pb[k1,k2])
                     
     #Find ranges for each in order to get time with reduction velocity
     pgin,pnin,pbin=[],[],[]
