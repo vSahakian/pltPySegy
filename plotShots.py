@@ -200,8 +200,10 @@ def plot_shot_gather_byRange(obsnum,obsfile,shot_beg,shot_end,tlims,throw,ktpfil
         ttmp=None
         for i in range(pn.shape[1]):
             ttmp=tred.tred(pn[1][i],pnr[i],vred)
-            pn_shotind=np.array(pn[0][i]).astype(int)
-            plt.plot(shotx[pn_shotind-shot_beg],ttmp,color='m',alpha=0.7,linewidth=2)
+            for j in range(len(pnr[i])):
+                ind=np.where(sn[i][j]==fshots)
+                if ind:
+                    plt.plot(shotx[ind],ttmp,color='m',alpha=0.7,linewidth=2)
         ##pb:
         ttmp=None
         for i in range(pb.shape[1]):
