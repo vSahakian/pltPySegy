@@ -40,10 +40,11 @@ def plot_shot_gather_byRange(obsnum,obsfile,shot_beg,shot_end,tlims,throw,ktpfil
     #Find shots within range of shot_beg to shot_end
     shotind=np.where((shotnums>=shot_beg) & (shotnums<= shot_end))[0]
     #Pull out x position of shots (shotx)
-    shotx=shotinfo[shotind,1][0]
+    shotx=shotinfo[shotind,1]
     
     #shots from file:
-    fshots=np.sort(shotnums[shotind])
+    fshots=shotnums[shotind]
+    #fshots=np.sort(shotnums[shotind])
     #shots=np.arange(shot_beg,shot_end+1,1)
     
     #These shots aren't necessarily the same index as those in the 
@@ -53,9 +54,11 @@ def plot_shot_gather_byRange(obsnum,obsfile,shot_beg,shot_end,tlims,throw,ktpfil
         header=obsn[i].stats.segy.trace_header.unpacked_header
         segyshots[i]=unpack(">i",header[8:12])[0]
     
-    #what indices in the segy file correspond to the shots in the requested range?    
+    #What indices in the segy file correspond to the shots in the requested range?    
+    #this index may also be used for plotting, to refer to the amplitudes
     segshotind=np.where(fshots==segyshots)[0]
     #Now get the sorted version, for later:
+    #this might actually be bad...i think later they should be sorted by range...
     segsortind=np.argsort(segyshots[segshotind][:,0])
     
     #Get source to receiver range
@@ -65,7 +68,7 @@ def plot_shot_gather_byRange(obsnum,obsfile,shot_beg,shot_end,tlims,throw,ktpfil
         print current_shot
         header=obsn[current_shot].stats.segy.trace_header.unpacked_header
         rng[k]=unpack(">i",header[36:40])[0]
-    shot_rang_match=[fshots,rng[segshotind]]
+    shot_rang_match=[fshots,rng]
     #rng=np.zeros(len(obsn))
     #for k in range(len(obsn)):
     #    header=obsn[k].stats.segy.trace_header.unpacked_header
@@ -84,25 +87,44 @@ def plot_shot_gather_byRange(obsnum,obsfile,shot_beg,shot_end,tlims,throw,ktpfil
     pgout,pnout,pbout=[],[],[]
     pgr,pnr,pbr=[],[],[]
     
+    #For the times and shots:
+    ktpin=[]
+    sin=[]
+    
+    ktpgout,ktpnout,ktpbout=[],[],[]
+    ktpg,ktpn,ktpb=[],[],[]
+    
+    sgout,snout,sbout=[],[],[]
+    sg,sn,sb=[],[],[]
+    
     #For Pg
     for i in range(pg.shape[1]):
         pgin=[]
         for j in range(len(pg[0][i])):
             snum=pg[0][i][j]
             ind=np.where(shot_rang_match[0]==snum)[0]
-            pgin.append(shot_rang_match[1][ind][0])
+            if ind:
+                pgin.append(shot_rang_match[1][ind][0])
         pgout.append(pgin)
+            
     pgr=np.array(pgout)
             
     #For Pn
     for i in range(pn.shape[1]):
-        pnin=[]
+        pnin,sin,ktpin=[],[],[]
         for j in range(len(pn[0][i])):
             snum=pn[0][i][j]
             ind=np.where(shot_rang_match[0]==snum)[0]
-            pnin.append(shot_rang_match[1][ind][0])
+            if ind:
+                pnin.append(shot_rang_match[1][ind][0])
+                sin.append(pn[0][i][j])
+                ktpin.append(pn[1][i][j])
         pnout.append(pnin)
-    pnr=np.array(pnout)      
+        snout.append(sin)
+        ktpnout.append(ktpin)
+    pnr=np.array(pnout)  
+    sn=np.array(snout)
+    ktpn=np.array(ktpnout)    
             
     #For Pb
     for i in range(pb.shape[1]):
@@ -110,9 +132,16 @@ def plot_shot_gather_byRange(obsnum,obsfile,shot_beg,shot_end,tlims,throw,ktpfil
         for j in range(len(pb[0][i])):
             snum=pb[0][i][j]
             ind=np.where(shot_rang_match[0]==snum)[0]
-            pbin.append(shot_rang_match[1][ind][0])
-        pbout.append(pbin)
-    pbr=np.array(pbout)        
+            if ind:
+                pbin.append(shot_rang_match[1][ind][0])
+                pbout.append(pbin)
+    pbr=np.array(pbout)    
+    
+    #Get pick time for each shot:
+    for i in range(len(fshots)):
+        snum=shot_rang_match[0][i]
+        for j in range(pn.shape[1]):
+                
     
     #Plot!
     plt.close('all')
@@ -121,10 +150,10 @@ def plot_shot_gather_byRange(obsnum,obsfile,shot_beg,shot_end,tlims,throw,ktpfil
     #Set figure size
     #f.set_size_inches(6,3)
     
-    for i in range(len(obsn)):
-        t=obsn[i].times()
+    for i in range(len(fshots)):
+        t=obsn[segshotind[i]].times()
         tnew=tred.tred(t,rng[i],vred)
-        amp=obsn[i].data
+        amp=obsn[segshotind[i]].data
         #Scale by 0.18 - arbitrary, based on visual.  This is to keep it normalized between the average shot range difference, ~0.08 for obs72
         amp=trscale*(amp/max(abs(amp)))
         #Get positive part for shading
@@ -142,15 +171,36 @@ def plot_shot_gather_byRange(obsnum,obsfile,shot_beg,shot_end,tlims,throw,ktpfil
         
         #Plot travel-time picks - number of segments is in the 1 index of *.shape
         #pg: 
+        
+        #First, sort the shots by range so they will be sorted in order:
+        rind=np.argsort(shotx)
+        
+        
+    ttmp=None
+    for j in range(np.shape(pn)[1]):
+        plotind=[]
+        for i in range(len(fshots)):
+            tmpind=rind[i]
+            tmpind2=np.where((np.array(pn[0][j]).astype(int)==fshots[tmpind]))[0]
+            if tmpind2:
+                plotind.append(tmpind2[0])
+
+        #for k in range(len(plotind)):
+        #    ttmp=tred.tred(pn[1][plotind[k]],pnr[(or rng??)
+                    
+        
+        
+        
         ttmp=None
         for i in range(pg.shape[1]):
-            ttmp=tred.tred(pg[1][i],pgr[i],vred)
-            #Turn the shots into an array of integers to use as indices
-            pg_shotind=np.array(pg[0][i]).astype(int)
-            #subtract the first shot number from each called shot here so the index 
-            #used for shotx starts at 0 if the first shot called is shot_beg, and after
-            #that will be "offset" by shot_beg 
-            plt.plot(shotx[pg_shotind-shot_beg],ttmp,color='k',alpha=0.7,linewidth=2)
+            if len(pgr[i])>0:
+                ttmp=tred.tred(pg[1][i],pgr[i],vred)
+                #Turn the shots into an array of integers to use as indices
+                pg_shotind=np.array(pg[0][i]).astype(int)
+                #subtract the first shot number from each called shot here so the index 
+                #used for shotx starts at 0 if the first shot called is shot_beg, and after
+                #that will be "offset" by shot_beg 
+                plt.plot(shotx[pg_shotind-shot_beg],ttmp,color='k',alpha=0.7,linewidth=2)
         ##pn: - this has been finagled, need to fix read_ktp to get rid of empty array
         ttmp=None
         for i in range(pn.shape[1]):
@@ -168,7 +218,7 @@ def plot_shot_gather_byRange(obsnum,obsfile,shot_beg,shot_end,tlims,throw,ktpfil
         #plt.ylim([0,1.7])
         #plt.show()
         #plt.plot(amp+i,tnew,color='k')
-    plt.ylim([0,1.5])
+    plt.ylim([t0,tend])
     #plt.xlim([min(obsn[0].data),len(obsn)+max(obsn[len(obsn)-1].data)])
     plt.xlim([shotx[0], shotx[-1]])
     plt.xlabel('Along-track Distance (km)',fontsize=12, fontname='Helvetica')
