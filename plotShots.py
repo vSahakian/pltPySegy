@@ -137,11 +137,6 @@ def plot_shot_gather_byRange(obsnum,obsfile,shot_beg,shot_end,tlims,throw,ktpfil
                 pbout.append(pbin)
     pbr=np.array(pbout)    
     
-    #Get pick time for each shot:
-    for i in range(len(fshots)):
-        snum=shot_rang_match[0][i]
-        for j in range(pn.shape[1]):
-                
     
     #Plot!
     plt.close('all')
@@ -176,14 +171,14 @@ def plot_shot_gather_byRange(obsnum,obsfile,shot_beg,shot_end,tlims,throw,ktpfil
         rind=np.argsort(shotx)
         
         
-    ttmp=None
-    for j in range(np.shape(pn)[1]):
-        plotind=[]
-        for i in range(len(fshots)):
-            tmpind=rind[i]
-            tmpind2=np.where((np.array(pn[0][j]).astype(int)==fshots[tmpind]))[0]
-            if tmpind2:
-                plotind.append(tmpind2[0])
+        ttmp=None
+        for j in range(np.shape(pn)[1]):
+            plotind=[]
+            for i in range(len(fshots)):
+                tmpind=rind[i]
+                tmpind2=np.where((np.array(pn[0][j]).astype(int)==fshots[tmpind]))[0]
+                if tmpind2:
+                    plotind.append(tmpind2[0])
 
         #for k in range(len(plotind)):
         #    ttmp=tred.tred(pn[1][plotind[k]],pnr[(or rng??)
