@@ -1,19 +1,21 @@
 def read_ktp(ktpfile,throw,last_shot):
-# Convert ktp file used for pltsegy into digestible format for plotting.
-#    Usage:
-#        [pg,pn,pb]=read_ktp(ktpfile)
-#Input:
-#        ktpfile:       String with full path of ktpfile
-#        throw:         if throw==1, throw out land shots.  if throw==0, keep land shots.
-#        last_shot:     last shot to compute
-#Output:
-#        pg:            list of first-arrival pick segments
-#        pn:            list of second-arrival pick segments
-#        pb:            list of basement or reflector pick segments 
-#Note on format:
-#        p*[0] contains lists of shots for each segment
-#        p*[1] contains lists of pick times for each segment   
-#
+    '''
+    Convert ktp file used for pltsegy into digestible format for plotting.
+    Usage:
+        [pg,pn,pb]=read_ktp(ktpfile)
+    Input:
+        ktpfile:       String with full path of ktpfile
+        throw:         if throw==1, throw out land shots.  if throw==0, keep land shots.
+        last_shot:     last shot to compute
+    Output:
+        pg:            list of first-arrival pick segments
+        pn:            list of second-arrival pick segments
+        pb:            list of basement or reflector pick segments 
+    Note on format:
+        p*[0] contains lists of shots for each segment
+        p*[1] contains lists of pick times for each segment   
+    '''
+    
     import numpy as np
     
     pg_t, pn_t, pb_t=np.array([]),np.array([]),np.array([])
@@ -22,6 +24,7 @@ def read_ktp(ktpfile,throw,last_shot):
     f=open(ktpfile,'r')
     ktp=f.readlines()
     k=0
+    print k
     while k<len(ktp)-1:
         if ktp[k]=='Pg\n':
             k=k+6
