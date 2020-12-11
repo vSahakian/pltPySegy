@@ -427,6 +427,9 @@ def plot_chirp(DISTANCEp,TIMESp,AMPp,plotcmap,plotheight,plotwidth,pcmin,pcmax,l
             ## loop through segments:
             i_horizon = horizons['horizons'][i_horizon_ind]
             i_horizon_color = horizoncolors.loc[horizoncolors.horizon == i_horizon].color.values[0]
+            i_horizon_linewidth = horizoncolors.loc[horizoncolors.horizon == i_horizon].linewidth.values[0]
+            i_horizon_transparency = horizoncolors.loc[horizoncolors.horizon == i_horizon].transparency.values[0]
+            
             for j_segment_ind in range(len(horizons[i_horizon]['X'])):
                 ij_x = array(horizons[i_horizon]['X'][j_segment_ind])
                 ij_y = array(horizons[i_horizon]['Y'][j_segment_ind])
@@ -437,9 +440,9 @@ def plot_chirp(DISTANCEp,TIMESp,AMPp,plotcmap,plotheight,plotwidth,pcmin,pcmax,l
                 
                 ## Plot - if it's the first, add a label:
                 if j_segment_ind == 0:
-                    twtt_ax.plot(ij_dist,ij_z,linewidth=0.8,color=i_horizon_color,alpha=0.75,label=i_horizon)
+                    twtt_ax.plot(ij_dist,ij_z,linewidth=i_horizon_linewidth,color=i_horizon_color,alpha=i_horizon_transparency,label=i_horizon)
                 else:
-                    twtt_ax.plot(ij_dist,ij_z,linewidth=0.8,color=i_horizon_color,alpha=0.75)
+                    twtt_ax.plot(ij_dist,ij_z,linewidth=i_horizon_linewidth,color=i_horizon_color,alpha=i_horizon_transparency)
                     
     ## If there were faults given:
     if faults != None:
@@ -451,6 +454,8 @@ def plot_chirp(DISTANCEp,TIMESp,AMPp,plotcmap,plotheight,plotwidth,pcmin,pcmax,l
             i_fault = faults['faultnames'][i_fault_ind]
             i_fault_color = faultstyles.loc[faultstyles.fault == i_fault].color.values[0]
             i_fault_linestyle = faultstyles.loc[faultstyles.fault == i_fault].linestyle.values[0]
+            i_fault_linewidth = faultstyles.loc[faultstyles.fault == i_fault].linewidth.values[0]
+            i_fault_transparency = faultstyles.loc[faultstyles.fault == i_fault].transparency.values[0]
             
             ## Get X, Y, Z
             ij_x = array(faults['X'][i_fault_ind])
@@ -465,9 +470,9 @@ def plot_chirp(DISTANCEp,TIMESp,AMPp,plotcmap,plotheight,plotwidth,pcmin,pcmax,l
             ##   then add it and label it:
             if i_fault not in faultplot_counter:
                 faultplot_counter.append(i_fault)
-                twtt_ax.plot(ij_dist,ij_z,linewidth=1,color=i_fault_color,linestyle=i_fault_linestyle,alpha=0.75,label=i_fault)
+                twtt_ax.plot(ij_dist,ij_z,linewidth=i_fault_linewidth,color=i_fault_color,linestyle=i_fault_linestyle,alpha=i_fault_transparency,label=i_fault)
             else:
-                twtt_ax.plot(ij_dist,ij_z,linewidth=1,color=i_fault_color,linestyle=i_fault_linestyle,alpha=0.75)
+                twtt_ax.plot(ij_dist,ij_z,linewidth=i_fault_linewidth,color=i_fault_color,linestyle=i_fault_linestyle,alpha=i_fault_transparency)
                 
     if ((faults != None) or (horizons !=None)):
         ## First, adjust subplots to give room for legend:
